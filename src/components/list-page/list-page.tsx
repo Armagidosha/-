@@ -151,12 +151,13 @@ export const ListPage: React.FC = () => {
       await delay(700)
     }
     renderCircle(Number(index), true, result[index].element, ElementStates.Changing, false)
+    list.removeAt(Number(index))
     await delay(DELAY_IN_MS)
-    hideCircle()
     await delay()
     for (const elem of animlist) {
       elem.state = ElementStates.Default
     }
+    hideCircle()
     setResult([...list.returnList()])
     updState('remIndex', false)
   }
