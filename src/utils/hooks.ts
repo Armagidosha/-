@@ -11,5 +11,5 @@ export const useInput = (event: Value) => {
     const {value, name} = event.target;
     setValues({...inputs, [name]: value});
   }, [inputs]);
-  return {inputs, handleChange};
+  return {inputs, setValues, handleChange};
 }
