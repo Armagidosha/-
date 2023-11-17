@@ -1,0 +1,23 @@
+.container {
+  max-width: 940px;
+  align-items: center;
+}
+
+.radioContainer {
+  display: flex;
+  gap: 20px;
+  margin: 0 50px 0 0  
+}
+
+.ul {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  column-gap: 16px;
+  list-style: none;
+  padding: 0;
+  max-width: 1106px;
+  min-height: 350px;
+  margin: 48px auto 0;
+  flex-wrap: wrap;
+}
