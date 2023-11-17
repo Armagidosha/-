@@ -72,7 +72,7 @@ export const StringComponent: React.FC = () => {
           text='Развернуть'
           onClick={onSubmit}
           isLoader={isDisabled}
-        />
+          disabled={!inputs.value.length} />
       </div>
       <ul className={styles.ul}> {
         result?.map((element, index) =>

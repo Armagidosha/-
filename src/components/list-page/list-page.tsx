@@ -11,7 +11,8 @@ import { Circle } from '../ui/circle/circle';
 import { ArrowIcon } from '../ui/icons/arrow-icon';
 import { delay } from '../../utils/utils';
 import { DELAY_IN_MS } from '../../constants/delays';
-import { AnimQueue, Loading } from '../../types/linked-list';
+import { AnimQueue } from '../../types/linked-list';
+import { useLoading } from '../../utils/hooks';
 
 const defList = ['1', '12', '42', '0', '8'].reverse().map(element => ({
   element: element,
@@ -25,15 +26,8 @@ export const ListPage: React.FC = () => {
     value: '',
     index: ''
   })
-
-  const [result, setResult] = useState<StateArray<string>[]>([])
-  const [animQueue, setAnimQueue] = useState<AnimQueue>({
-    index: null,
-    showCircle: false,
-    isHead: false,
-    element: null,
-  })
-  const [isLoading, setIsLoAding] = useState<Loading>({
+  
+  const { isLoading, isDisabled, updateState } = useLoading({
     append: false,
     prepend: false,
     detachHead: false,
@@ -42,10 +36,13 @@ export const ListPage: React.FC = () => {
     remIndex: false
   })
 
-  const isDisabled = Object.values(isLoading).some((value) => value === true)
-  const updState = (state: string, arg: boolean) => {
-    setIsLoAding({ ...isLoading, [state]: arg })
-  }
+  const [result, setResult] = useState<StateArray<string>[]>([])
+  const [animQueue, setAnimQueue] = useState<AnimQueue>({
+    index: null,
+    showCircle: false,
+    isHead: false,
+    element: null,
+  })
 
   const renderCircle = (index: number, show: boolean, element: string, state?: ElementStates, isHead?: boolean) => {
     if (show) {
@@ -68,7 +65,7 @@ export const ListPage: React.FC = () => {
   }
 
   const append = async (element: string) => {
-    updState('append', true)
+    updateState('append', true)
     renderCircle(result.length - 1, true, element, ElementStates.Changing, true)
     const tail = list.append({
       element: element, state: ElementStates.Modified
@@ -79,11 +76,11 @@ export const ListPage: React.FC = () => {
     tail.value.state = ElementStates.Default
     await delay(DELAY_IN_MS)
     setResult([...list.returnList()])
-    updState('append', false)
+    updateState('append', false)
   }
 
   const prepend = async (element: string) => {
-    updState('prepend', true)
+    updateState('prepend', true)
     renderCircle(0, true, element, ElementStates.Changing, true)
     const head = list.prepend({ element: element, state: ElementStates.Modified })
     await delay(DELAY_IN_MS)
@@ -92,11 +89,11 @@ export const ListPage: React.FC = () => {
     head.value.state = ElementStates.Default
     await delay(DELAY_IN_MS)
     setResult([...list.returnList()])
-    updState('prepend', false)
+    updateState('prepend', false)
   }
 
   const remHead = async () => {
-    updState('detachHead', true)
+    updateState('detachHead', true)
     const element = list.detachHead()
     if (element) {
       renderCircle(0, true, element.value.element, ElementStates.Changing, false)
@@ -105,11 +102,11 @@ export const ListPage: React.FC = () => {
     await delay(DELAY_IN_MS)
     hideCircle()
     setResult([...list.returnList()])
-    updState('detachHead', false)
+    updateState('detachHead', false)
   }
 
   const remTail = async () => {
-    updState('detachTail', true)
+    updateState('detachTail', true)
     const element = list.detachTail()
     if (element) {
       renderCircle(result.length - 1, true, element.value.element, ElementStates.Changing, false)
@@ -118,11 +115,11 @@ export const ListPage: React.FC = () => {
     await delay(DELAY_IN_MS)
     hideCircle()
     setResult([...list.returnList()])
-    updState('detachTail', false)
+    updateState('detachTail', false)
   }
 
   const insertIndex = async (element: string, index: number) => {
-    updState('insertIndex', true)
+    updateState('insertIndex', true)
     const addedNode = list.insertAt({
       element: element,
       state: ElementStates.Modified
@@ -139,11 +136,11 @@ export const ListPage: React.FC = () => {
       addedNode.value.state = ElementStates.Default
     }
     setResult([...list.returnList()])
-    updState('insertIndex', false)
+    updateState('insertIndex', false)
   }
 
   const remIndex = async (index: number) => {
-    updState('remIndex', true)
+    updateState('remIndex', true)
     const animlist = list.returnList()
     for (let i = 0; i <= index; i++) {
       animlist[i].state = ElementStates.Changing
@@ -159,7 +156,7 @@ export const ListPage: React.FC = () => {
     }
     hideCircle()
     setResult([...list.returnList()])
-    updState('remIndex', false)
+    updateState('remIndex', false)
   }
 
   useEffect(() => {
@@ -212,19 +209,21 @@ export const ListPage: React.FC = () => {
             onChange={handleChange}
             placeholder='Введите индекс'
             name='index'
+            type='number'
+            max={result.length - 1}
             disabled={result.length === 6 || isDisabled}
             extraClass={styles.input} />
           <Button
             type='submit'
             text='Добавить по индексу'
-            disabled={result.length === 6 || !inputs.index.length || !inputs.value.length || isDisabled}
+            disabled={result.length === 6 || !inputs.index.length || inputs.index > result.length - 1 || !inputs.value.length || inputs.index < 0 || isDisabled}
             isLoader={isLoading.insertIndex}
             linkedList='big'
             onClick={() => insertIndex(inputs.value, inputs.index)} />
           <Button
             type='submit'
             text='Удалить по индексу'
-            disabled={result.length === 0 || !inputs.index.length || result.length <= inputs.index || isDisabled}
+            disabled={result.length === 0 || !inputs.index.length || inputs.index < 0 || result.length <= inputs.index || isDisabled}
             isLoader={isLoading.remIndex}
             linkedList='big'
             onClick={() => remIndex(inputs.index)} />

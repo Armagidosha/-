@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from '../ui/input/input';
 import { Button } from '../ui/button/button';
-import { useInput } from '../../utils/hooks';
+import { useInput, useLoading } from '../../utils/hooks';
 import { ElementStates } from '../../types/element-states';
 import { StateArray } from '../../types/uTypes';
 import { Circle } from '../ui/circle/circle';
@@ -18,15 +18,20 @@ export const QueuePage: React.FC = () => {
     value: ''
   })
 
+  const { isLoading, isDisabled, updateState } = useLoading({
+    enqueue: false,
+    dequeue: false,
+    clear: false,
+  })
+
   const [result, setResult] = useState<StateArray<string>[]>([])
-  const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
   useEffect(() => {
     setResult([...queue.queue as StateArray<string>[]])
   }, [])
 
   const enqueue = async () => {
-    setIsDisabled(true)
+    updateState('enqueue', true)
     setValues({ value: '' })
 
     queue.enqueue({
@@ -40,11 +45,11 @@ export const QueuePage: React.FC = () => {
       lastEl.state = ElementStates.Default
     }
     setResult([...queue.queue as StateArray<string>[]])
-    setIsDisabled(false)
+    updateState('enqueue', false)
   }
 
   const dequeue = async () => {
-    setIsDisabled(true)
+    updateState('dequeue', true)
     const firstEl = queue.queue[queue.start]
     if (firstEl) {
       firstEl.state = ElementStates.Changing
@@ -53,15 +58,15 @@ export const QueuePage: React.FC = () => {
     await delay()
     queue.dequeue()
     setResult([...queue.queue as StateArray<string>[]])
-    setIsDisabled(false)
+    updateState('dequeue', false)
   };
 
   const clear = async () => {
     queue.clear()
-    setIsDisabled(true)
+    updateState('clear', true)
     await delay()
     setResult([...queue.queue as StateArray<string>[]])
-    setIsDisabled(false)
+    updateState('clear', false)
   }
 
   return (
@@ -72,25 +77,26 @@ export const QueuePage: React.FC = () => {
           maxLength={4}
           onChange={handleChange}
           name='value'
+          disabled={isDisabled}
           value={inputs.value} />
         <Button
           type="submit"
           text='Добавить'
           onClick={enqueue}
-          isLoader={isDisabled}
-          disabled={queue.end === queue.arrSize} />
+          isLoader={isLoading.enqueue}
+          disabled={isDisabled || !inputs.value.length || queue.end === queue.arrSize} />
         <Button
           type="button"
           text='Удалить'
           onClick={dequeue}
-          isLoader={isDisabled}
-          disabled={queue.start >= queue.end} />
+          isLoader={isLoading.dequeue}
+          disabled={isDisabled || queue.start >= queue.end} />
         <Button
           extraClass='ml-40'
           type="reset"
           text='Очистить'
-          isLoader={isDisabled}
-          disabled={!(queue.end > 0 || queue.start > 0)}
+          isLoader={isLoading.clear}
+          disabled={isDisabled || !(queue.end > 0 || queue.start > 0)}
           onClick={clear} />
       </div>
       <ul className={styles.ul}>

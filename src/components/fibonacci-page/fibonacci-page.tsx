@@ -9,8 +9,8 @@ import { delay } from '../../utils/utils';
 import { calcFibonacci } from './fibonacci';
 
 export const FibonacciPage: React.FC = () => {
-  const { inputs, handleChange } = useInput({
-    value: null
+  const { inputs, setValues, handleChange } = useInput({
+    value: ''
   })
   const [result, setResult] = useState<number[]>([]);
   const [isDisabled, setIsDisabled] = useState<boolean>(false)
@@ -28,6 +28,7 @@ export const FibonacciPage: React.FC = () => {
       setResult(prev => [...prev, el])
     }
     setIsDisabled(false)
+    setValues({value: ''})
   }
 
 
@@ -36,15 +37,17 @@ export const FibonacciPage: React.FC = () => {
       <div className='input-container'>
         <Input
           onChange={handleChange}
-          value={inputs.fibValue}
+          value={inputs.value}
           type="number"
           isLimitText={true}
           max={19}
+          disabled={isDisabled}
           name="value" />
         <Button
           onClick={(evt) => onSubmit(evt, inputs.value)}
           type="submit"
           text="Рассчитать"
+          disabled={!inputs.value.length || inputs.value > 19 || inputs.value < 0}
           isLoader={isDisabled} />
       </div>
       <ul className={styles.ul}> {

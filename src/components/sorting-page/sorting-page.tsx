@@ -8,12 +8,18 @@ import { StateArray } from '../../types/uTypes';
 import { Column } from '../ui/column/column';
 import { ElementStates } from '../../types/element-states';
 import { delay } from '../../utils/utils';
+import { useLoading } from '../../utils/hooks';
 
 export const SortingPage: React.FC = () => {
 
+  const { isLoading, isDisabled, updateState } = useLoading({
+    ascending: false,
+    descending: false,
+    newArray: false
+  })
+
   const [result, setResult] = useState<StateArray<number>[]>([])
   const [sortingAlgo, setSortingAlgo] = useState<string>('selection')
-  const [isDisabled, setIsDisabled] = useState<boolean>()
   
   const randomizeArray = (minL: number, maxL: number) => {
     const arrayLength = Math.floor(Math.random() * (maxL - minL + 1)) + minL
@@ -28,7 +34,6 @@ export const SortingPage: React.FC = () => {
   }
 
   const bubbleSort = async (arr: StateArray<number>[], ascending: boolean) => {
-    setIsDisabled(true)
     const length = arr.length
     for (let i = 0; i < length; i++) {
       for (let j = 0; j < length - 1 - i; j++) {
@@ -49,9 +54,7 @@ export const SortingPage: React.FC = () => {
       }
       arr[length - i - 1].state = ElementStates.Modified
     }
-
     setResult([...arr])
-    setIsDisabled(false)
   }
 
 
@@ -66,7 +69,8 @@ export const SortingPage: React.FC = () => {
         arr[j].state = ElementStates.Changing
         setResult([...arr])
         await delay(100)
-        const shouldSwap = ascending ? arr[j].element < arr[minIndex].element :
+        const shouldSwap = ascending ? 
+        arr[j].element < arr[minIndex].element :
           arr[j].element > arr[minIndex].element;
 
         if (shouldSwap) {
@@ -89,39 +93,47 @@ export const SortingPage: React.FC = () => {
     setResult([...arr])
   }
 
-  const chooseFunc = (ascending = true) => {
+  const chooseFunc = async (ascending = true) => {
     if (sortingAlgo === 'selection') {
-      selectionSort(result, ascending)
+      ascending ? updateState('ascending', true) : updateState('descending', true)
+      updateState('newArray', true)
+      await selectionSort(result, ascending)
+
     } else {
-      bubbleSort(result, ascending)
+      !ascending ? updateState('descending', true) : updateState('ascending', true)
+      updateState('newArray', true)
+      await bubbleSort(result, ascending)
     }
+    updateState('ascending', false)
+    updateState('descending', false)
+    updateState('newArray', false)
   }
 
   return (
     <SolutionLayout title="Сортировка массива">
       <div className={`${styles.container} input-container`}>
         <div className={styles.radioContainer}>
-          <RadioInput label="Выбор" name="sorting" onInput={() => setSortingAlgo('selection')} defaultChecked />
-          <RadioInput label="Пузырёк" name="sorting" onInput={() => setSortingAlgo('bubble')} />
+          <RadioInput label="Выбор" name="sorting" disabled={isDisabled} onInput={() => setSortingAlgo('selection')} defaultChecked />
+          <RadioInput label="Пузырёк" name="sorting" disabled={isDisabled} onInput={() => setSortingAlgo('bubble')} />
         </div>
         <Button
           text="По возрастанию"
           onClick={() => chooseFunc(true)}
           sorting={Direction.Ascending}
-          isLoader={isDisabled}
-          disabled={result.length ? false : true}
+          isLoader={isLoading.ascending}
+          disabled={isDisabled || !result.length}
           linkedList='big' />
         <Button
           text="По убыванию"
           onClick={() => chooseFunc(false)}
           sorting={Direction.Descending}
-          isLoader={isDisabled}
-          disabled={result.length ? false : true}
+          isLoader={isLoading.descending}
+          disabled={isDisabled || !result.length}
           linkedList='big' />
         <Button
           extraClass='ml-40'
           text='Новый массив'
-          isLoader={isDisabled}
+          disabled={isDisabled}
           onClick={() => randomizeArray(3, 17)}
         />
       </div>
