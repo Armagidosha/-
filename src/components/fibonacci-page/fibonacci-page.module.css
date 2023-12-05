@@ -1,0 +1,10 @@
+.ul {
+  display: flex;
+  column-gap: 16px;
+  list-style: none;
+  padding: 0;
+  max-width: 944px;
+  min-height: 268px;
+  margin: 74px auto 0;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,15 @@
+.container {
+  max-width: 900px;
+}
+
+.ul {
+  display: flex;
+  row-gap: 60px;
+  justify-content: center;
+  column-gap: 16px;
+  list-style: none;
+  padding: 0;
+  max-width: 1040px;
+  margin: 146px auto 0;
+  flex-wrap: wrap;
+}
