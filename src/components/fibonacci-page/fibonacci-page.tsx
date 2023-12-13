@@ -42,13 +42,15 @@ export const FibonacciPage: React.FC = () => {
           isLimitText={true}
           max={19}
           disabled={isDisabled}
-          name="value" />
+          name="value" 
+          data-cy='input' />
         <Button
           onClick={(evt) => onSubmit(evt, inputs.value)}
           type="submit"
           text="Рассчитать"
           disabled={!inputs.value.length || inputs.value > 19 || inputs.value < 0}
-          isLoader={isDisabled} />
+          isLoader={isDisabled} 
+          data-cy='button' />
       </div>
       <ul className={styles.ul}> {
         result.map((element, index) =>

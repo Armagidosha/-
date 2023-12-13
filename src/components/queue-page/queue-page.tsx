@@ -78,26 +78,30 @@ export const QueuePage: React.FC = () => {
           onChange={handleChange}
           name='value'
           disabled={isDisabled}
-          value={inputs.value} />
+          value={inputs.value}
+          data-cy='input' />
         <Button
           type="submit"
           text='Добавить'
           onClick={enqueue}
           isLoader={isLoading.enqueue}
-          disabled={isDisabled || !inputs.value.length || queue.end === queue.arrSize} />
+          disabled={isDisabled || !inputs.value.length || queue.end === queue.arrSize}
+          data-cy='button' />
         <Button
           type="button"
           text='Удалить'
           onClick={dequeue}
           isLoader={isLoading.dequeue}
-          disabled={isDisabled || queue.start >= queue.end} />
+          disabled={isDisabled || queue.start >= queue.end}
+          data-cy='button' />
         <Button
           extraClass='ml-40'
           type="reset"
           text='Очистить'
           isLoader={isLoading.clear}
           disabled={isDisabled || !(queue.end > 0 || queue.start > 0)}
-          onClick={clear} />
+          onClick={clear}
+          data-cy='button' />
       </div>
       <ul className={styles.ul}>
         {result.map((element, index) =>
