@@ -26,7 +26,7 @@ export const ListPage: React.FC = () => {
     value: '',
     index: ''
   })
-  
+
   const { isLoading, isDisabled, updateState } = useLoading({
     append: false,
     prepend: false,
@@ -126,7 +126,7 @@ export const ListPage: React.FC = () => {
     }, Number(index))
     for (let i = 0; i <= index; i++) {
       renderCircle(i, true, element, ElementStates.Changing, true)
-      await delay(700)
+      await delay(DELAY_IN_MS)
     }
     if (addedNode) {
       hideCircle()
@@ -142,15 +142,18 @@ export const ListPage: React.FC = () => {
   const remIndex = async (index: number) => {
     updateState('remIndex', true)
     const animlist = list.returnList()
+    const deletedEl = animlist[index].element
     for (let i = 0; i <= index; i++) {
       animlist[i].state = ElementStates.Changing
       setResult([...animlist])
-      await delay(700)
+      await delay(DELAY_IN_MS)
     }
-    renderCircle(Number(index), true, result[index].element, ElementStates.Changing, false)
+    animlist[index].element = ''
+    animlist[index].state = ElementStates.Default
+    setResult([...animlist])
+    renderCircle(Number(index), true, deletedEl, ElementStates.Changing, false)
     list.removeAt(Number(index))
     await delay(DELAY_IN_MS)
-    await delay()
     for (const elem of animlist) {
       elem.state = ElementStates.Default
     }
@@ -174,35 +177,40 @@ export const ListPage: React.FC = () => {
             disabled={result.length === 6 || isDisabled}
             maxLength={4}
             isLimitText={true}
-            extraClass={styles.input} />
+            extraClass={styles.input}
+            data-cy='input' />
           <Button
             type='submit'
             text='Добавить в head'
             disabled={result.length === 6 || inputs.value.length === 0 || isDisabled}
             isLoader={isLoading.prepend}
             linkedList='big'
-            onClick={() => prepend(inputs.value)} />
+            onClick={() => prepend(inputs.value)}
+            data-cy='button' />
           <Button
             type='submit'
             text='Добавить в tail'
             disabled={result.length === 6 || inputs.value.length === 0 || isDisabled}
             isLoader={isLoading.append}
             linkedList='big'
-            onClick={() => append(inputs.value)} />
+            onClick={() => append(inputs.value)}
+            data-cy='button' />
           <Button
             type='submit'
             text='Удалить из head'
             isLoader={isLoading.detachHead}
             disabled={!result.length || isDisabled}
             linkedList='big'
-            onClick={remHead} />
+            onClick={remHead}
+            data-cy='button' />
           <Button
             type='submit'
             text='Удалить из tail'
             isLoader={isLoading.detachTail}
             disabled={!result.length || isDisabled}
             linkedList='big'
-            onClick={remTail} />
+            onClick={remTail}
+            data-cy='button' />
         </div>
         <div className={styles.container}>
           <Input
@@ -211,22 +219,25 @@ export const ListPage: React.FC = () => {
             name='index'
             type='number'
             max={result.length - 1}
-            disabled={result.length === 6 || isDisabled}
-            extraClass={styles.input} />
+            disabled={result.length === 0 || isDisabled}
+            extraClass={styles.input}
+            data-cy='input' />
           <Button
             type='submit'
             text='Добавить по индексу'
             disabled={result.length === 6 || !inputs.index.length || inputs.index > result.length - 1 || !inputs.value.length || inputs.index < 0 || isDisabled}
             isLoader={isLoading.insertIndex}
             linkedList='big'
-            onClick={() => insertIndex(inputs.value, inputs.index)} />
+            onClick={() => insertIndex(inputs.value, inputs.index)}
+            data-cy='button' />
           <Button
             type='submit'
             text='Удалить по индексу'
             disabled={result.length === 0 || !inputs.index.length || inputs.index < 0 || result.length <= inputs.index || isDisabled}
             isLoader={isLoading.remIndex}
             linkedList='big'
-            onClick={() => remIndex(inputs.index)} />
+            onClick={() => remIndex(inputs.index)}
+            data-cy='button' />
         </div>
         <ul className={styles.ul}>
           {result.map((element, index) => {

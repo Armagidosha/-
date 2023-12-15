@@ -19,9 +19,9 @@ export const StringComponent: React.FC = () => {
   const [result, setResult] = useState<StateArray<string>[]>();
   const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
-  const reverseString = async () => {
+  const reverseString = async (string: string) => {
     setIsDisabled(true)
-    const inputString = await inputs.value;
+    const inputString = string
     let splitted: StateArray<string>[] = Array.from(inputString, (letter: string) => ({
       element: letter,
       state: ElementStates.Default
@@ -56,7 +56,7 @@ export const StringComponent: React.FC = () => {
   const onSubmit = (evt: FormEvent) => {
     evt.preventDefault();
     setResult([])
-    reverseString()
+    reverseString(inputs.value)
   }
 
   return (
@@ -66,13 +66,15 @@ export const StringComponent: React.FC = () => {
           onChange={handleChange}
           name='value'
           isLimitText={true}
-          maxLength={11} />
+          maxLength={11} 
+          data-cy='input' />
         <Button
           type="button"
           text='Развернуть'
           onClick={onSubmit}
           isLoader={isDisabled}
-          disabled={!inputs.value.length} />
+          disabled={!inputs.value.length} 
+          data-cy='button' />
       </div>
       <ul className={styles.ul}> {
         result?.map((element, index) =>

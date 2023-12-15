@@ -74,26 +74,29 @@ export const StackPage: React.FC = () => {
           disabled={isDisabled}
           name='value'
           value={inputs.value}
-        />
+          data-cy='input'/>
         <Button
           type="submit"
           text='Добавить'
           onClick={push}
           disabled={isDisabled || !inputs.value.length}
-          isLoader={isLoading.push} />
+          isLoader={isLoading.push} 
+          data-cy='button' />
         <Button
           type="button"
           text='Удалить'
           onClick={pop}
           disabled={isDisabled || !stack.size} 
-          isLoader={isLoading.pop} />
+          isLoader={isLoading.pop} 
+          data-cy='button' />
         <Button
           extraClass='ml-40'
           type="reset"
           text='Очистить'
           onClick={clear}
           disabled={isDisabled || !stack.size}
-          isLoader={isLoading.clear} />
+          isLoader={isLoading.clear} 
+          data-cy='button' />
       </div>
       <ul className={styles.ul}>
         {result.map((element, index) =>

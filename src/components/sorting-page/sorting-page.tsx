@@ -14,13 +14,12 @@ export const SortingPage: React.FC = () => {
 
   const { isLoading, isDisabled, updateState } = useLoading({
     ascending: false,
-    descending: false,
-    newArray: false
+    descending: false
   })
 
   const [result, setResult] = useState<StateArray<number>[]>([])
   const [sortingAlgo, setSortingAlgo] = useState<string>('selection')
-  
+
   const randomizeArray = (minL: number, maxL: number) => {
     const arrayLength = Math.floor(Math.random() * (maxL - minL + 1)) + minL
     const randomizedArray: StateArray<number>[] = []
@@ -34,79 +33,77 @@ export const SortingPage: React.FC = () => {
   }
 
   const bubbleSort = async (arr: StateArray<number>[], ascending: boolean) => {
-    const length = arr.length
+    const newArr = arr
+    const length = newArr.length
     for (let i = 0; i < length; i++) {
       for (let j = 0; j < length - 1 - i; j++) {
-        arr[j].state = ElementStates.Changing
-        arr[j + 1].state = ElementStates.Changing
-        const shouldSwap = ascending ? arr[j].element > arr[j + 1].element :
-          arr[j].element < arr[j + 1].element;
+        newArr[j].state = ElementStates.Changing
+        newArr[j + 1].state = ElementStates.Changing
+        const shouldSwap = ascending ? newArr[j].element > newArr[j + 1].element :
+          newArr[j].element < newArr[j + 1].element;
 
         if (shouldSwap) {
-          const temp = arr[j].element;
-          arr[j].element = arr[j + 1].element;
-          arr[j + 1].element = temp;
+          const temp = newArr[j].element;
+          newArr[j].element = newArr[j + 1].element;
+          newArr[j + 1].element = temp;
           await delay()
-          setResult([...arr])
+          setResult([...newArr])
         }
-        arr[j].state = ElementStates.Default
-        arr[j + 1].state = ElementStates.Default
+        newArr[j].state = ElementStates.Default
+        newArr[j + 1].state = ElementStates.Default
       }
-      arr[length - i - 1].state = ElementStates.Modified
+      newArr[length - i - 1].state = ElementStates.Modified
     }
-    setResult([...arr])
+    setResult([...newArr])
   }
 
 
   const selectionSort = async (arr: StateArray<number>[], ascending: boolean) => {
-    const length = arr.length;
-
+    const newArr = arr
+    const length = newArr.length;
     for (let i = 0; i < length; i++) {
       let minIndex = i;
-      arr[minIndex].state = ElementStates.Changing
-      setResult([...arr])
+      newArr[minIndex].state = ElementStates.Changing
+      setResult([...newArr])
       for (let j = i + 1; j < length; j++) {
-        arr[j].state = ElementStates.Changing
-        setResult([...arr])
+        newArr[j].state = ElementStates.Changing
+        setResult([...newArr])
         await delay(100)
-        const shouldSwap = ascending ? 
-        arr[j].element < arr[minIndex].element :
-          arr[j].element > arr[minIndex].element;
+        const shouldSwap = ascending ?
+          newArr[j].element < newArr[minIndex].element :
+          newArr[j].element > newArr[minIndex].element;
 
         if (shouldSwap) {
           minIndex = j;
         }
-        arr[j].state = ElementStates.Default
-        setResult([...arr])
+        newArr[j].state = ElementStates.Default
+        setResult([...newArr])
       }
 
       if (minIndex !== i) {
-        const temp = arr[i];
-        arr[i] = arr[minIndex];
-        arr[minIndex] = temp;
-        arr[minIndex].state = ElementStates.Default;
-        arr[i].state = ElementStates.Modified;
+        const temp = newArr[i];
+        newArr[i] = arr[minIndex];
+        newArr[minIndex] = temp;
+        newArr[minIndex].state = ElementStates.Default;
+        newArr[i].state = ElementStates.Modified;
       }
-      arr[i].state = ElementStates.Modified;
+      newArr[i].state = ElementStates.Modified;
     }
 
-    setResult([...arr])
+    setResult([...newArr])
   }
 
   const chooseFunc = async (ascending = true) => {
     if (sortingAlgo === 'selection') {
       ascending ? updateState('ascending', true) : updateState('descending', true)
-      updateState('newArray', true)
       await selectionSort(result, ascending)
 
     } else {
       !ascending ? updateState('descending', true) : updateState('ascending', true)
-      updateState('newArray', true)
       await bubbleSort(result, ascending)
     }
     updateState('ascending', false)
     updateState('descending', false)
-    updateState('newArray', false)
   }
 
   return (
